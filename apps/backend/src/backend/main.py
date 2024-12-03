@@ -25,5 +25,5 @@ if __name__ == "__main__":
                 interval=settings.sync_delta,
                 timezone="America/Los_Angeles",
             )
-        ]
+        ],
     )

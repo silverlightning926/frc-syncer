@@ -4,8 +4,11 @@ import requests
 from models.db.tba_page_etag import TBAPageEtag
 from models.tba.event_simple import EventSimple
 from prefect import task
-from services.db_service import (get_tba_events_page_etag, upsert_events,
-                                 upsert_tba_page_etag)
+from services.db_service import (
+    get_tba_events_page_etag,
+    upsert_events,
+    upsert_tba_page_etag,
+)
 from settings import settings
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
@@ -33,8 +36,10 @@ def process_event_response(response):
         print("Events: ETAG match. Skipping.")
         return None
     elif response.status_code != 200:
-        print(f"Events: Failed to fetch events. Status Code: {
-              response.status_code}")
+        print(
+            f"Events: Failed to fetch events. Status Code: {
+              response.status_code}"
+        )
         return None
     return [EventSimple(**event) for event in response.json()]
 
@@ -54,7 +59,7 @@ def upsert_event_data(events, response):
     name="Fetch Events",
     description="Fetches all events for the current season.",
     tags=["tba"],
-    version="1.0"
+    version="1.0",
 )
 def fetch_events():
     headers = prepare_event_headers()
