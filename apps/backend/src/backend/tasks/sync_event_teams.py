@@ -49,7 +49,8 @@ def upsert_event_teams_data(event_key, event_teams, response):
             page_num=0, etag=response.headers.get("ETag"), endpoint=f"event-teams-{event_key}"
         )
         upsert_tba_page_etag(new_etag)
-        print(f"Event Teams: Fetched {len(event_teams)} event teams.")
+        print(f"Event Teams ({event_key}): Fetched {
+              len(event_teams)} event teams.")
 
 
 @task
