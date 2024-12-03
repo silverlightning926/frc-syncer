@@ -21,3 +21,6 @@ lint = ["flake8>=7.1.1", "black>=24.10.0", "isort>=5.13.2"]
 
 [tool.pdm]
 distribution = false
+
+[tool.isort]
+profile = "black"
