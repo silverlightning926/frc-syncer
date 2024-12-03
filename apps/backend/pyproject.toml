@@ -15,6 +15,9 @@ requires-python = "==3.13.*"
 readme = "README.md"
 license = { text = "MIT" }
 
+[dependency-groups]
+lint = ["flake8>=7.1.1", "black>=24.10.0", "isort>=5.13.2"]
+
 
 [tool.pdm]
 distribution = false
