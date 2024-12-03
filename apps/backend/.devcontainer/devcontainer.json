@@ -16,7 +16,8 @@
 				"ms-python.python",
 				"ms-python.debugpy",
 				"ms-python.isort",
-				"ninoseki.vscode-mogami"
+				"ninoseki.vscode-mogami",
+				"ms-python.flake8"
 			]
 		}
 	}

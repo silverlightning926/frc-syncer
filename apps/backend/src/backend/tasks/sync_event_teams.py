@@ -24,7 +24,7 @@ def prepare_event_teams_headers(event_key: str):
 
 
 @task
-def fetch_event_teams_data(headers, event_key: str) -> list[str]:
+def fetch_event_teams_data(headers, event_key: str) -> requests.Response:
     url = f"https://www.thebluealliance.com/api/v3/event/{
         event_key}/teams/keys"
     return requests.get(url, headers=headers)
