@@ -38,6 +38,11 @@ def _upsert_districts(districts: list[District]):
         [district.model_dump() for district in districts]).execute()
 
 
+def get_event_keys() -> list[str]:
+    response = supabase.table("events").select("key").execute()
+    return [event["key"] for event in response.data]
+
+
 def upsert_events(events: list[EventSimple]):
 
     districts = list(
@@ -60,6 +65,11 @@ def upsert_events(events: list[EventSimple]):
 
     supabase.table("events").upsert(
         [event.model_dump() for event in events]).execute()
+
+
+def upsert_event_teams(event_key: str, teams: list[str]):
+    supabase.table("event-teams").upsert(
+        [{"event_key": event_key, "team_key": team} for team in teams]).execute()
 
 
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
@@ -88,6 +98,22 @@ def get_tba_events_page_etag() -> TBAPageEtag:
 
     response = supabase.table("tba-pages-etags").select(
         "etag", "endpoint").eq("endpoint", "events").limit(1).execute()
+
+    if len(response.data) == 0:
+        return None
+
+    etag_data = response.data[0]
+    return TBAPageEtag(
+        page_num=0,
+        etag=etag_data["etag"],
+        endpoint=etag_data["endpoint"],
+    )
+
+
+def get_tba_event_teams_page_etag(event_key: str) -> TBAPageEtag:
+
+    response = supabase.table("tba-pages-etags").select(
+        "etag", "endpoint").eq("endpoint", f"event-teams-{event_key}").limit(1).execute()
 
     if len(response.data) == 0:
         return None
