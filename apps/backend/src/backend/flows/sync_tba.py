@@ -1,5 +1,6 @@
 from prefect import flow
 from services.db_service import insert_last_sync
+from tasks.sync_event_matches import sync_all_event_matches
 from tasks.sync_events import fetch_events
 from tasks.sync_teams import fetch_teams
 
@@ -10,10 +11,10 @@ from tasks.sync_teams import fetch_teams
     version="1.0",
 )
 def sync_tba_data():
-    teams = fetch_teams.submit()
-    events = fetch_events.submit()
+    fetch_teams()
 
-    teams.result()
-    events.result()
+    fetch_events()
+
+    sync_all_event_matches()
 
     insert_last_sync()
