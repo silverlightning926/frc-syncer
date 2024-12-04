@@ -47,7 +47,12 @@ def process_event_response(response):
 @task
 def filter_offseasons(events: list[EventSimple]):
     return [
-        event for event in events if event.get_event_type_str() != "Offseason"
+        event
+        for event in events
+        if event.event_type != 99
+        and event.event_type != 100
+        and event.event_type != -1
+        and event.event_type != 7
     ]
 
 
