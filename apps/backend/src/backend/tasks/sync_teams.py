@@ -59,7 +59,7 @@ def upsert_team_data(page_num, teams, response):
 
 
 @task
-def pause_between_pages(interval_secs):
+def throttle_request(interval_secs=10):
     time.sleep(interval_secs)
 
 
@@ -69,7 +69,7 @@ def pause_between_pages(interval_secs):
     tags=["tba"],
     version="1.0",
 )
-def fetch_teams(page_interval_secs=10):
+def fetch_teams():
     page_num = 0
     while True:
         headers = prepare_team_headers(page_num)
@@ -83,4 +83,4 @@ def fetch_teams(page_interval_secs=10):
         upsert_team_data(page_num, teams, response)
 
         page_num += 1
-        pause_between_pages(page_interval_secs)
+        throttle_request()
