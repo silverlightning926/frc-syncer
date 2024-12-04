@@ -2,19 +2,21 @@ from datetime import datetime
 
 from flows.sync_tba import sync_tba_data
 from prefect.client.schemas.schedules import IntervalSchedule
+from pydantic_extra_types.pendulum_dt import DateTime
 from services.db_service import get_last_synced
 from settings import settings
 
 if __name__ == "__main__":
-    last_synced: datetime = get_last_synced()
+    last_synced = get_last_synced()
 
     if not last_synced or last_synced < datetime.now() - settings.sync_delta:
         print("No last sync found. Syncing data.")
         sync_tba_data()
-        last_synced = datetime.now()
+        last_synced = DateTime.now()
 
     else:
         print("Last sync found.")
+        last_synced = DateTime.fromisoformat(last_synced.isoformat())
 
     print("Scheduling sync.")
     sync_tba_data.serve(

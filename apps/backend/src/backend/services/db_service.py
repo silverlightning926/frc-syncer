@@ -15,12 +15,15 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 def upsert_teams(teams: list[TeamSimple]):
 
-    teams = [
+    db_teams = [
         Team(
             key=team.key,
             number=team.team_number,
@@ -33,7 +36,7 @@ def upsert_teams(teams: list[TeamSimple]):
     ]
 
     supabase.table("teams").upsert(
-        [team.model_dump() for team in teams]
+        [team.model_dump() for team in db_teams]
     ).execute()
 
 
@@ -59,7 +62,7 @@ def upsert_events(events: list[EventSimple]):
     )
     _upsert_districts(districts)
 
-    events = [
+    db_events = [
         Event(
             key=event.key,
             name=event.name,
@@ -77,7 +80,7 @@ def upsert_events(events: list[EventSimple]):
     ]
 
     supabase.table("events").upsert(
-        [event.model_dump() for event in events]
+        [event.model_dump() for event in db_events]
     ).execute()
 
 
@@ -86,7 +89,7 @@ def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     supabase.table("tba-pages-etags").upsert([etag.model_dump()]).execute()
 
 
-def get_tba_teams_page_etag(page_num: int) -> TBAPageEtag:
+def get_tba_teams_page_etag(page_num: int) -> TBAPageEtag | None:
 
     response = (
         supabase.table("tba-pages-etags")
@@ -108,7 +111,7 @@ def get_tba_teams_page_etag(page_num: int) -> TBAPageEtag:
     )
 
 
-def get_tba_events_page_etag() -> TBAPageEtag:
+def get_tba_events_page_etag() -> TBAPageEtag | None:
 
     response = (
         supabase.table("tba-pages-etags")
@@ -129,7 +132,7 @@ def get_tba_events_page_etag() -> TBAPageEtag:
     )
 
 
-def get_last_synced() -> datetime:
+def get_last_synced() -> datetime | None:
 
     response = (
         supabase.table("tba-sync")

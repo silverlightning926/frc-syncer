@@ -5,5 +5,5 @@
 	"editor.codeActionsOnSave": {
 		"source.organizeImports": "explicit"
 	},
-	"editor.defaultFormatter": "ms-python.black-formatter"
+	"editor.defaultFormatter": "ms-python.flake8"
 }
