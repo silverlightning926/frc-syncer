@@ -58,7 +58,7 @@ def upsert_event_matches_data(event_key, matches, response):
             endpoint=f"events/{event_key}/matches",
         )
         upsert_tba_page_etag(new_etag)
-        print(f"Event Matches: Fetched {len(matches)} matches.")
+        print(f"Event Matches ({event_key}): Fetched {len(matches)} matches.")
 
 
 @task
