@@ -4,7 +4,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "nodemon --exec pdm run src/backend/main.py --ext py,json,toml",
-		"start": "pdm run src/backend/main.py"
+		"start": "pdm run src/backend/main.py",
+		"lint": "pdm run isort src && pdm run black src && pdm run flake8 src"
 	},
 	"dependencies": {
 		"nodemon": "^3.1.7"
