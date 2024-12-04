@@ -81,12 +81,6 @@ def upsert_events(events: list[EventSimple]):
     ).execute()
 
 
-def upsert_event_teams(event_key: str, teams: list[str]):
-    supabase.table("event-teams").upsert(
-        [{"event_key": event_key, "team_key": team} for team in teams]
-    ).execute()
-
-
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
 
     supabase.table("tba-pages-etags").upsert([etag.model_dump()]).execute()
@@ -135,27 +129,6 @@ def get_tba_events_page_etag() -> TBAPageEtag:
     )
 
 
-def get_tba_event_teams_page_etag(event_key: str) -> TBAPageEtag:
-
-    response = (
-        supabase.table("tba-pages-etags")
-        .select("etag", "endpoint")
-        .eq("endpoint", f"event-teams-{event_key}")
-        .limit(1)
-        .execute()
-    )
-
-    if len(response.data) == 0:
-        return None
-
-    etag_data = response.data[0]
-    return TBAPageEtag(
-        page_num=0,
-        etag=etag_data["etag"],
-        endpoint=etag_data["endpoint"],
-    )
-
-
 def get_last_synced() -> datetime:
 
     response = (
@@ -177,27 +150,3 @@ def insert_last_sync():
     supabase.table("tba-sync").insert(
         [{"synced_on": datetime.now().isoformat()}]
     ).execute()
-
-
-def validate_team_key(team_key: str) -> bool:
-    response = (
-        supabase.table("teams")
-        .select("key")
-        .eq("key", team_key)
-        .limit(1)
-        .execute()
-    )
-
-    return len(response.data) > 0
-
-
-def validate_event_key(event_key: str) -> bool:
-    response = (
-        supabase.table("events")
-        .select("key")
-        .eq("key", event_key)
-        .limit(1)
-        .execute()
-    )
-
-    return len(response.data) > 0
