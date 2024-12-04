@@ -77,6 +77,7 @@ def fetch_events():
     headers = prepare_event_headers()
     response = fetch_event_data(headers)
     events = process_event_response(response)
+
     if events:
         events = filter_offseasons(events)
-    upsert_event_data(events, response)
+        upsert_event_data(events, response)

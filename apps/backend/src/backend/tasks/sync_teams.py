@@ -75,9 +75,12 @@ def fetch_teams(page_interval_secs=10):
         headers = prepare_team_headers(page_num)
         response = fetch_team_page_data(page_num, headers)
         teams = process_team_page_response(page_num, response)
+
         if not teams:
             # TODO: Fix to not break if etag page match and [] is returned
             break
-        upsert_team_data(page_num, teams, response)
+        else:
+            upsert_team_data(page_num, teams, response)
+
         page_num += 1
         pause_between_pages(page_interval_secs)

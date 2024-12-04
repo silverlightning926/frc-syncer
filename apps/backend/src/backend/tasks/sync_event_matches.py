@@ -71,8 +71,10 @@ def sync_event_matches(event_key: str):
     headers = prepare_event_matches_headers(event_key)
     response = fetch_event_matches_page_data(event_key, headers)
     matches = process_event_teams_response(response)
+
     if matches:
         upsert_event_matches_data(event_key, matches, response)
+
     throttle_request()
 
 
