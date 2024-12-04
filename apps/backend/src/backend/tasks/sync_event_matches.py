@@ -28,7 +28,8 @@ def prepare_event_matches_headers(event_key):
 def fetch_event_matches_page_data(
     event_key: str, headers
 ) -> requests.Response:
-    url = f"https://www.thebluealliance.com/api/v3/event/{event_key}/matches/simple"
+    url = f"https://www.thebluealliance.com/api/v3/event/{
+        event_key}/matches/simple"
     return requests.get(url, headers=headers)
 
 
