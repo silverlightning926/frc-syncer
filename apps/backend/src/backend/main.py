@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flows.sync_tba import sync_tba_data
 from prefect.client.schemas.schedules import IntervalSchedule

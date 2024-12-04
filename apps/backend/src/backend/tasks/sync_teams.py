@@ -50,7 +50,9 @@ def upsert_team_data(page_num, teams, response):
     if teams:
         upsert_teams(teams)
         new_etag = TBAPageEtag(
-            page_num=page_num, etag=response.headers.get("ETag"), endpoint="teams"
+            page_num=page_num,
+            etag=response.headers.get("ETag"),
+            endpoint="teams",
         )
         upsert_tba_page_etag(new_etag)
         print(f"Team Page {page_num}: Fetched {len(teams)} teams.")

@@ -32,7 +32,9 @@ def upsert_teams(teams: list[TeamSimple]):
         for team in teams
     ]
 
-    supabase.table("teams").upsert([team.model_dump() for team in teams]).execute()
+    supabase.table("teams").upsert(
+        [team.model_dump() for team in teams]
+    ).execute()
 
 
 def _upsert_districts(districts: list[District]):
@@ -50,7 +52,9 @@ def upsert_events(events: list[EventSimple]):
 
     districts = list(
         {
-            event.district.key: event.district for event in events if event.district
+            event.district.key: event.district
+            for event in events
+            if event.district
         }.values()
     )
     _upsert_districts(districts)
@@ -72,7 +76,9 @@ def upsert_events(events: list[EventSimple]):
         for event in events
     ]
 
-    supabase.table("events").upsert([event.model_dump() for event in events]).execute()
+    supabase.table("events").upsert(
+        [event.model_dump() for event in events]
+    ).execute()
 
 
 def upsert_event_teams(event_key: str, teams: list[str]):
@@ -175,7 +181,11 @@ def insert_last_sync():
 
 def validate_team_key(team_key: str) -> bool:
     response = (
-        supabase.table("teams").select("key").eq("key", team_key).limit(1).execute()
+        supabase.table("teams")
+        .select("key")
+        .eq("key", team_key)
+        .limit(1)
+        .execute()
     )
 
     return len(response.data) > 0
@@ -183,7 +193,11 @@ def validate_team_key(team_key: str) -> bool:
 
 def validate_event_key(event_key: str) -> bool:
     response = (
-        supabase.table("events").select("key").eq("key", event_key).limit(1).execute()
+        supabase.table("events")
+        .select("key")
+        .eq("key", event_key)
+        .limit(1)
+        .execute()
     )
 
     return len(response.data) > 0
