@@ -80,4 +80,5 @@ def fetch_events():
 
     if events:
         events = filter_offseasons(events)
-        upsert_event_data(events, response)
+
+    upsert_event_data(events, response)
