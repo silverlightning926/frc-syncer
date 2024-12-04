@@ -45,6 +45,13 @@ def process_event_response(response):
 
 
 @task
+def filter_offseasons(events: list[EventSimple]):
+    return [
+        event for event in events if event.get_event_type_str() != "Offseason"
+    ]
+
+
+@task
 def upsert_event_data(events, response):
     if events:
         upsert_events(events)
@@ -65,4 +72,6 @@ def fetch_events():
     headers = prepare_event_headers()
     response = fetch_event_data(headers)
     events = process_event_response(response)
+    if events:
+        events = filter_offseasons(events)
     upsert_event_data(events, response)
