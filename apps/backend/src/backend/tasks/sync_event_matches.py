@@ -1,5 +1,6 @@
 import os
 import time
+from settings import settings
 
 import requests
 from models.db.tba_page_etag import TBAPageEtag
@@ -60,6 +61,25 @@ def upsert_event_matches_data(event_key, matches, response):
         upsert_tba_page_etag(new_etag)
         print(f"Event Matches ({event_key}): Fetched {len(matches)} matches.")
 
+@task
+def filter_matches(matches: list[MatchSimple]):
+    filtered_matches = []
+
+    for match in matches:
+        should_exclude = any(
+            any(
+                team_key in alliance.team_keys
+                or team_key in alliance.surrogate_team_keys
+                or team_key in alliance.dq_team_keys
+                for team_key in settings.teams_blacklist
+            )
+            for alliance in match.alliances.values()
+        )
+
+        if not should_exclude:
+            filtered_matches.append(match)
+
+    return filtered_matches
 
 @task
 def throttle_request(interval_secs=10):
@@ -71,6 +91,9 @@ def sync_event_matches(event_key: str):
     headers = prepare_event_matches_headers(event_key)
     response = fetch_event_matches_page_data(event_key, headers)
     matches = process_event_teams_response(response)
+    
+    if matches:
+        matches = filter_matches(matches)
 
     upsert_event_matches_data(event_key, matches, response)
     throttle_request()
