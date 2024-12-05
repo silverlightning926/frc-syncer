@@ -5,9 +5,9 @@ from models.db.tba_page_etag import TBAPageEtag
 from models.tba.event_simple import EventSimple
 from prefect import task
 from services.db_service import (
+    get_tba_page_etag,
     upsert_events,
     upsert_tba_page_etag,
-    get_tba_page_etag
 )
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
@@ -15,11 +15,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 @task
 def prepare_event_headers(year: int):
-    etag = get_tba_page_etag(
-        page_num=0, 
-        year=year,
-        endpoint="events"
-    )
+    etag = get_tba_page_etag(page_num=0, year=year, endpoint="events")
     headers = HEADERS.copy()
     if etag:
         headers["If-None-Match"] = etag.etag
@@ -63,7 +59,10 @@ def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)
         new_etag = TBAPageEtag(
-            page_num=0, etag=response.headers.get("ETag"), endpoint="events", year=year
+            page_num=0,
+            etag=response.headers.get("ETag"),
+            endpoint="events",
+            year=year,
         )
         upsert_tba_page_etag(new_etag)
         print(f"Events: Fetched {len(events)} events.")

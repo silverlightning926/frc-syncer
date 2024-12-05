@@ -51,7 +51,9 @@ def _upsert_districts(districts: list[District]):
 
 
 def get_event_keys_for_year(year: int) -> list[str]:
-    response = supabase.table("events").select("key").eq("year", year).execute()
+    response = (
+        supabase.table("events").select("key").eq("year", year).execute()
+    )
     return [event["key"] for event in response.data]
 
 
@@ -200,7 +202,9 @@ def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     supabase.table("tba-pages-etags").upsert([etag.model_dump()]).execute()
 
 
-def get_tba_page_etag(page_num: int, endpoint: str, year: int) -> TBAPageEtag | None:
+def get_tba_page_etag(
+    page_num: int, endpoint: str, year: int
+) -> TBAPageEtag | None:
 
     response = (
         supabase.table("tba-pages-etags")

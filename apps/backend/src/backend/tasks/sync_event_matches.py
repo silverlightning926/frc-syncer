@@ -7,9 +7,9 @@ from models.tba.match_simple import MatchSimple
 from prefect import task
 from services.db_service import (
     get_event_keys_for_year,
+    get_tba_page_etag,
     upsert_event_matches,
     upsert_tba_page_etag,
-    get_tba_page_etag,
 )
 from settings import settings
 

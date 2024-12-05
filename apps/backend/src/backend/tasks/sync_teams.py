@@ -6,9 +6,9 @@ from models.db.tba_page_etag import TBAPageEtag
 from models.tba.team_simple import TeamSimple
 from prefect import task
 from services.db_service import (
+    get_tba_page_etag,
     upsert_tba_page_etag,
     upsert_teams,
-    get_tba_page_etag
 )
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
@@ -16,11 +16,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 @task
 def prepare_team_headers(page_num, year: int):
-    etag = get_tba_page_etag(
-        page_num=page_num,
-        year=year,
-        endpoint="teams"
-    )
+    etag = get_tba_page_etag(page_num=page_num, year=year, endpoint="teams")
     headers = HEADERS.copy()
     if etag:
         headers["If-None-Match"] = etag.etag
@@ -29,7 +25,8 @@ def prepare_team_headers(page_num, year: int):
 
 @task
 def fetch_team_page_data(page_num, headers, year: int):
-    url = f"https://www.thebluealliance.com/api/v3/teams/{year}/{page_num}/simple"
+    url = f"https://www.thebluealliance.com/api/v3/teams/{
+        year}/{page_num}/simple"
     return requests.get(url, headers=headers)
 
 
@@ -48,14 +45,14 @@ def process_team_page_response(page_num, response):
 
 
 @task
-def upsert_team_data(page_num, teams, response , year: int):
+def upsert_team_data(page_num, teams, response, year: int):
     if teams:
         upsert_teams(teams)
         new_etag = TBAPageEtag(
             page_num=page_num,
             etag=response.headers.get("ETag"),
             endpoint="teams",
-            year=year
+            year=year,
         )
         upsert_tba_page_etag(new_etag)
         print(f"Team Page {page_num}: Fetched {len(teams)} teams.")
