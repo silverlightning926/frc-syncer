@@ -82,7 +82,7 @@ def filter_matches(matches: list[MatchSimple]):
     return filtered_matches
 
 @task
-def throttle_request(interval_secs=10):
+def throttle_request(interval_secs=15):
     time.sleep(interval_secs)
 
 
