@@ -6,10 +6,10 @@ from models.db.tba_page_etag import TBAPageEtag
 from models.tba.match_simple import MatchSimple
 from prefect import task
 from services.db_service import (
-    get_event_keys,
-    get_tba_event_matches_page_etag,
+    get_event_keys_for_year,
     upsert_event_matches,
     upsert_tba_page_etag,
+    get_tba_page_etag,
 )
 from settings import settings
 
@@ -17,8 +17,12 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task
-def prepare_event_matches_headers(event_key):
-    etag = get_tba_event_matches_page_etag(event_key)
+def prepare_event_matches_headers(event_key, year: int):
+    etag = get_tba_page_etag(
+        page_num=0,
+        year=year,
+        endpoint=f"events/{event_key}/matches",
+    )
     headers = HEADERS.copy()
     if etag:
         headers["If-None-Match"] = etag.etag
@@ -50,13 +54,14 @@ def process_event_teams_response(response):
 
 
 @task
-def upsert_event_matches_data(event_key, matches, response):
+def upsert_event_matches_data(event_key, matches, response, year: int):
     if matches:
         upsert_event_matches(matches)
         new_etag = TBAPageEtag(
             page_num=0,
             etag=response.headers.get("ETag"),
             endpoint=f"events/{event_key}/matches",
+            year=year,
         )
         upsert_tba_page_etag(new_etag)
         print(f"Event Matches ({event_key}): Fetched {len(matches)} matches.")
@@ -89,15 +94,15 @@ def throttle_request(interval_secs=15):
 
 
 @task
-def sync_event_matches(event_key: str):
-    headers = prepare_event_matches_headers(event_key)
+def sync_event_matches(event_key: str, year: int):
+    headers = prepare_event_matches_headers(event_key, year)
     response = fetch_event_matches_page_data(event_key, headers)
     matches = process_event_teams_response(response)
 
     if matches:
         matches = filter_matches(matches)
 
-    upsert_event_matches_data(event_key, matches, response)
+    upsert_event_matches_data(event_key, matches, response, year=year)
     throttle_request()
 
 
@@ -107,8 +112,8 @@ def sync_event_matches(event_key: str):
     tags=["tba"],
     version="1.0",
 )
-def sync_all_event_matches():
-    event_keys = get_event_keys()
+def sync_all_event_matches(year: int):
+    event_keys = get_event_keys_for_year(year=year)
 
     for event_key in event_keys:
-        sync_event_matches(event_key)
+        sync_event_matches(event_key, year)

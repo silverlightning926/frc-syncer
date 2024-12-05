@@ -50,8 +50,8 @@ def _upsert_districts(districts: list[District]):
     ).execute()
 
 
-def get_event_keys() -> list[str]:
-    response = supabase.table("events").select("key").execute()
+def get_event_keys_for_year(year: int) -> list[str]:
+    response = supabase.table("events").select("key").eq("year", year).execute()
     return [event["key"] for event in response.data]
 
 
@@ -200,13 +200,14 @@ def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     supabase.table("tba-pages-etags").upsert([etag.model_dump()]).execute()
 
 
-def get_tba_teams_page_etag(page_num: int) -> TBAPageEtag | None:
+def get_tba_page_etag(page_num: int, endpoint: str, year: int) -> TBAPageEtag | None:
 
     response = (
         supabase.table("tba-pages-etags")
-        .select("etag", "endpoint")
+        .select("etag", "endpoint", "page_num")
         .eq("page_num", page_num)
-        .eq("endpoint", "teams")
+        .eq("endpoint", endpoint)
+        .eq("year", year)
         .limit(1)
         .execute()
     )
@@ -216,72 +217,8 @@ def get_tba_teams_page_etag(page_num: int) -> TBAPageEtag | None:
 
     etag_data = response.data[0]
     return TBAPageEtag(
-        page_num=page_num,
+        page_num=etag_data["page_num"],
         etag=etag_data["etag"],
         endpoint=etag_data["endpoint"],
+        year=etag_data["year"],
     )
-
-
-def get_tba_events_page_etag() -> TBAPageEtag | None:
-
-    response = (
-        supabase.table("tba-pages-etags")
-        .select("etag", "endpoint")
-        .eq("endpoint", "events")
-        .limit(1)
-        .execute()
-    )
-
-    if len(response.data) == 0:
-        return None
-
-    etag_data = response.data[0]
-    return TBAPageEtag(
-        page_num=0,
-        etag=etag_data["etag"],
-        endpoint=etag_data["endpoint"],
-    )
-
-
-def get_tba_event_matches_page_etag(event_key: str) -> TBAPageEtag | None:
-
-    response = (
-        supabase.table("tba-pages-etags")
-        .select("etag", "endpoint")
-        .eq("endpoint", f"events/{event_key}/matches")
-        .limit(1)
-        .execute()
-    )
-
-    if len(response.data) == 0:
-        return None
-
-    etag_data = response.data[0]
-    return TBAPageEtag(
-        page_num=0,
-        etag=etag_data["etag"],
-        endpoint=etag_data["endpoint"],
-    )
-
-
-def get_last_synced() -> datetime | None:
-
-    response = (
-        supabase.table("tba-sync")
-        .select("synced_on")
-        .order("id", desc=True)
-        .limit(1)
-        .execute()
-    )
-
-    if len(response.data) == 0:
-        return None
-
-    last_synced_data = response.data[0]
-    return datetime.fromisoformat(last_synced_data["synced_on"])
-
-
-def insert_last_sync():
-    supabase.table("tba-sync").insert(
-        [{"synced_on": datetime.now().isoformat()}]
-    ).execute()

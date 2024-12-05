@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
 
-    season: int = 2024
+    historic_seasons: list[int] = [2022, 2023, 2024]
 
     sync_delta: timedelta = timedelta(weeks=1)
 

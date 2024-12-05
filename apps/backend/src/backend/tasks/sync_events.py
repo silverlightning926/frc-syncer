@@ -5,18 +5,21 @@ from models.db.tba_page_etag import TBAPageEtag
 from models.tba.event_simple import EventSimple
 from prefect import task
 from services.db_service import (
-    get_tba_events_page_etag,
     upsert_events,
     upsert_tba_page_etag,
+    get_tba_page_etag
 )
-from settings import settings
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task
-def prepare_event_headers():
-    etag = get_tba_events_page_etag()
+def prepare_event_headers(year: int):
+    etag = get_tba_page_etag(
+        page_num=0, 
+        year=year,
+        endpoint="events"
+    )
     headers = HEADERS.copy()
     if etag:
         headers["If-None-Match"] = etag.etag
@@ -24,9 +27,8 @@ def prepare_event_headers():
 
 
 @task
-def fetch_event_data(headers):
-    url = f"https://www.thebluealliance.com/api/v3/events/{
-        settings.season}/simple"
+def fetch_event_data(headers, year: int):
+    url = f"https://www.thebluealliance.com/api/v3/events/{year}/simple"
     return requests.get(url, headers=headers)
 
 
@@ -57,28 +59,28 @@ def filter_offseasons(events: list[EventSimple]):
 
 
 @task
-def upsert_event_data(events, response):
+def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)
         new_etag = TBAPageEtag(
-            page_num=0, etag=response.headers.get("ETag"), endpoint="events"
+            page_num=0, etag=response.headers.get("ETag"), endpoint="events", year=year
         )
         upsert_tba_page_etag(new_etag)
         print(f"Events: Fetched {len(events)} events.")
 
 
 @task(
-    name="Fetch Events",
+    name="Fetch Events For Year",
     description="Fetches all events for the current season.",
     tags=["tba"],
     version="1.0",
 )
-def fetch_events():
-    headers = prepare_event_headers()
-    response = fetch_event_data(headers)
+def fetch_events(year: int):
+    headers = prepare_event_headers(year)
+    response = fetch_event_data(headers, year)
     events = process_event_response(response)
 
     if events:
         events = filter_offseasons(events)
 
-    upsert_event_data(events, response)
+    upsert_event_data(events, response, year)
