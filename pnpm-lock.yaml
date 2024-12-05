@@ -19,7 +19,7 @@ importers:
         version: 5.5.4
 
   apps/backend:
-    dependencies:
+    devDependencies:
       nodemon:
         specifier: ^3.1.7
         version: 3.1.7
