@@ -1,6 +1,5 @@
 import os
 import time
-from settings import settings
 
 import requests
 from models.db.tba_page_etag import TBAPageEtag
@@ -12,6 +11,7 @@ from services.db_service import (
     upsert_event_matches,
     upsert_tba_page_etag,
 )
+from settings import settings
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
@@ -61,6 +61,7 @@ def upsert_event_matches_data(event_key, matches, response):
         upsert_tba_page_etag(new_etag)
         print(f"Event Matches ({event_key}): Fetched {len(matches)} matches.")
 
+
 @task
 def filter_matches(matches: list[MatchSimple]):
     filtered_matches = []
@@ -81,6 +82,7 @@ def filter_matches(matches: list[MatchSimple]):
 
     return filtered_matches
 
+
 @task
 def throttle_request(interval_secs=15):
     time.sleep(interval_secs)
@@ -91,7 +93,7 @@ def sync_event_matches(event_key: str):
     headers = prepare_event_matches_headers(event_key)
     response = fetch_event_matches_page_data(event_key, headers)
     matches = process_event_teams_response(response)
-    
+
     if matches:
         matches = filter_matches(matches)
 
