@@ -15,7 +15,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 @task
 def prepare_event_headers(year: int):
-    etag = get_tba_page_etag(page_num=0, year=year, endpoint="events")
+    etag = get_tba_page_etag(page_num=None, year=year, endpoint="events")
     headers = HEADERS.copy()
     if etag:
         headers["If-None-Match"] = etag.etag

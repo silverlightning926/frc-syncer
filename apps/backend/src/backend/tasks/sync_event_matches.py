@@ -18,7 +18,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 @task
 def prepare_event_matches_headers(event_key, year: int):
     etag = get_tba_page_etag(
-        page_num=0,
+        page_num=None,
         year=year,
         endpoint=f"events/{event_key}/matches",
     )

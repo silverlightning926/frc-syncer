@@ -244,7 +244,7 @@ def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
 
 
 def get_tba_page_etag(
-    page_num: int, endpoint: str, year: int
+    page_num: int | None, endpoint: str, year: int
 ) -> TBAPageEtag | None:
 
     response = (
