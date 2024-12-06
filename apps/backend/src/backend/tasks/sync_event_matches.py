@@ -3,7 +3,6 @@ import time
 
 import requests
 from models.db.tba_page_etag import TBAPageEtag
-from models.tba.match_simple import MatchSimple
 from prefect import task
 from services.db_service import (
     get_event_keys_for_year,
@@ -12,6 +11,8 @@ from services.db_service import (
     upsert_tba_page_etag,
 )
 from settings import settings
+
+from models.tba.match import Match
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
@@ -34,7 +35,7 @@ def fetch_event_matches_page_data(
     event_key: str, headers
 ) -> requests.Response:
     url = f"https://www.thebluealliance.com/api/v3/event/{
-        event_key}/matches/simple"
+        event_key}/matches"
     return requests.get(url, headers=headers)
 
 
@@ -50,7 +51,7 @@ def process_event_teams_response(response):
         )
         return None
 
-    return [MatchSimple(**match) for match in response.json()]
+    return [Match(**match) for match in response.json()]
 
 
 @task
@@ -68,7 +69,7 @@ def upsert_event_matches_data(event_key, matches, response, year: int):
 
 
 @task
-def filter_matches(matches: list[MatchSimple]):
+def filter_matches(matches: list[Match]):
     filtered_matches = []
 
     for match in matches:

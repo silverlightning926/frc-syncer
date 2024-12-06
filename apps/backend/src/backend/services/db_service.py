@@ -1,19 +1,20 @@
 import os
 from datetime import datetime
+from json import dumps
 
 from dotenv import load_dotenv
 from models.db.alliance import Alliance
 from models.db.alliance_team import AllianceTeam
 from models.db.event import Event as DBEvent
 from models.db.event_division import EventDivision
-from models.db.match import Match
+from models.db.match import Match as DBMatch
 from models.db.tba_page_etag import TBAPageEtag
 from models.db.team import Team
 from models.tba.district import District
 from models.tba.event import Event as TBAEvent
-from models.tba.match_simple import MatchSimple
 from models.tba.team_simple import TeamSimple
 from supabase import Client, create_client
+from models.tba.match import Match as TBAMatch
 
 load_dotenv()
 
@@ -119,10 +120,10 @@ def upsert_events(events: list[TBAEvent]):
     _upsert_event_divisions(db_event_divisions)
 
 
-def upsert_event_matches(matches: list[MatchSimple]):
+def upsert_event_matches(matches: list[TBAMatch]):
 
     db_matches = [
-        Match(
+        DBMatch(
             key=match.key,
             comp_level=match.comp_level,
             set_number=match.set_number,
@@ -146,6 +147,11 @@ def upsert_event_matches(matches: list[MatchSimple]):
                 if match.predicted_time
                 else None
             ),
+            post_result_time=(
+                datetime.fromtimestamp(match.post_result_time).isoformat()
+                if match.post_result_time
+                else None
+            )
         )
         for match in matches
     ]
@@ -159,6 +165,9 @@ def upsert_event_matches(matches: list[MatchSimple]):
             match_key=match.key,
             color=alliance_color,
             score=alliance.score,
+            score_breakdown=(
+                dumps(match.score_breakdown[alliance_color]) if match.score_breakdown else None
+            ),
         )
         for match in matches
         for alliance_color, alliance in match.alliances.items()
