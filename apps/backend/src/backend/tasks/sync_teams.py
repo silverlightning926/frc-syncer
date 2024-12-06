@@ -59,7 +59,7 @@ def upsert_team_data(page_num, teams, response, year: int):
 
 
 @task
-def throttle_request(interval_secs=10):
+def throttle_request(interval_secs=15):
     time.sleep(interval_secs)
 
 
