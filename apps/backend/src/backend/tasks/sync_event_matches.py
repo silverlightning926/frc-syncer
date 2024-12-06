@@ -70,6 +70,7 @@ def upsert_event_matches_data(event_key, matches, response, year: int):
 
 @task
 def filter_matches(matches: list[Match]):
+    teams_blacklist: list[str] = ["frc0"]
     filtered_matches = []
 
     for match in matches:
@@ -78,7 +79,7 @@ def filter_matches(matches: list[Match]):
                 team_key in alliance.team_keys
                 or team_key in alliance.surrogate_team_keys
                 or team_key in alliance.dq_team_keys
-                for team_key in settings.teams_blacklist
+                for team_key in teams_blacklist
             )
             for alliance in match.alliances.values()
         )
