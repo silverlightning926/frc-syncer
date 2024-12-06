@@ -3,6 +3,7 @@ import time
 
 import requests
 from models.db.tba_page_etag import TBAPageEtag
+from models.tba.match import Match
 from prefect import task
 from services.db_service import (
     get_event_keys_for_year,
@@ -10,9 +11,6 @@ from services.db_service import (
     upsert_event_matches,
     upsert_tba_page_etag,
 )
-from settings import settings
-
-from models.tba.match import Match
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 

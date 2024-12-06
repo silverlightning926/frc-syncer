@@ -12,9 +12,9 @@ from models.db.tba_page_etag import TBAPageEtag
 from models.db.team import Team
 from models.tba.district import District
 from models.tba.event import Event as TBAEvent
+from models.tba.match import Match as TBAMatch
 from models.tba.team_simple import TeamSimple
 from supabase import Client, create_client
-from models.tba.match import Match as TBAMatch
 
 load_dotenv()
 
@@ -151,7 +151,7 @@ def upsert_event_matches(matches: list[TBAMatch]):
                 datetime.fromtimestamp(match.post_result_time).isoformat()
                 if match.post_result_time
                 else None
-            )
+            ),
         )
         for match in matches
     ]
@@ -166,7 +166,9 @@ def upsert_event_matches(matches: list[TBAMatch]):
             color=alliance_color,
             score=alliance.score,
             score_breakdown=(
-                dumps(match.score_breakdown[alliance_color]) if match.score_breakdown else None
+                dumps(match.score_breakdown[alliance_color])
+                if match.score_breakdown
+                else None
             ),
         )
         for match in matches
