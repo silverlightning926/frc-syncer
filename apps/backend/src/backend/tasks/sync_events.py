@@ -59,7 +59,7 @@ def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)
         new_etag = TBAPageEtag(
-            page_num=0,
+            page_num=None,
             etag=response.headers.get("ETag"),
             endpoint="events",
             year=year,

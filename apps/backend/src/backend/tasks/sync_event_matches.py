@@ -57,7 +57,7 @@ def upsert_event_matches_data(event_key, matches, response, year: int):
     if matches:
         upsert_event_matches(matches)
         new_etag = TBAPageEtag(
-            page_num=0,
+            page_num=None,
             etag=response.headers.get("ETag"),
             endpoint=f"events/{event_key}/matches",
             year=year,
