@@ -250,12 +250,15 @@ def get_tba_page_etag(
     response = (
         supabase.table("tba-pages-etags")
         .select("etag", "endpoint", "page_num", "year")
-        .eq("page_num", page_num)
         .eq("endpoint", endpoint)
         .eq("year", year)
         .limit(1)
-        .execute()
     )
+    
+    if page_num:
+        response = response.eq("page_num", page_num)
+        
+    response = response.execute()
 
     if len(response.data) == 0:
         return None
