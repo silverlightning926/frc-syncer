@@ -267,3 +267,10 @@ def get_tba_page_etag(
         endpoint=etag_data["endpoint"],
         year=etag_data["year"],
     )
+
+
+def insert_sync_timestamp(year: int) -> None:
+
+    supabase.table("tba-sync").insert(
+        [{"year": year, "synced_on": datetime.now().isoformat()}]
+    ).execute()
