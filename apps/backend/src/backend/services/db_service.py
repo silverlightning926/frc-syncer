@@ -42,7 +42,8 @@ def upsert_teams(teams: list[TeamSimple]):
     ]
 
     supabase.table("teams").upsert(
-        [team.model_dump() for team in db_teams]
+        [team.model_dump() for team in db_teams],
+        on_conflict="key",
     ).execute()
 
 
