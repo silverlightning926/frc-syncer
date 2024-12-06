@@ -4,12 +4,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 from models.db.alliance import Alliance
 from models.db.alliance_team import AllianceTeam
-from models.db.event import Event
+from models.db.event import Event as DBEvent
+from models.db.event_division import EventDivision
 from models.db.match import Match
 from models.db.tba_page_etag import TBAPageEtag
 from models.db.team import Team
 from models.tba.district import District
-from models.tba.event_simple import EventSimple
+from models.tba.event import Event as TBAEvent
 from models.tba.match_simple import MatchSimple
 from models.tba.team_simple import TeamSimple
 from supabase import Client, create_client
@@ -44,12 +45,6 @@ def upsert_teams(teams: list[TeamSimple]):
     ).execute()
 
 
-def _upsert_districts(districts: list[District]):
-    supabase.table("districts").upsert(
-        [district.model_dump() for district in districts]
-    ).execute()
-
-
 def get_event_keys_for_year(year: int) -> list[str]:
     response = (
         supabase.table("events").select("key").eq("year", year).execute()
@@ -57,7 +52,19 @@ def get_event_keys_for_year(year: int) -> list[str]:
     return [event["key"] for event in response.data]
 
 
-def upsert_events(events: list[EventSimple]):
+def _upsert_districts(districts: list[District]):
+    supabase.table("districts").upsert(
+        [district.model_dump() for district in districts]
+    ).execute()
+
+
+def _upsert_event_divisions(event_divisions: list[EventDivision]):
+    supabase.table("event-divisions").upsert(
+        [event_division.model_dump() for event_division in event_divisions]
+    ).execute()
+
+
+def upsert_events(events: list[TBAEvent]):
 
     districts = list(
         {
@@ -69,11 +76,11 @@ def upsert_events(events: list[EventSimple]):
     _upsert_districts(districts)
 
     db_events = [
-        Event(
+        DBEvent(
             key=event.key,
             name=event.name,
             event_code=event.event_code,
-            event_type=event.get_event_type_str(),
+            event_type=event.event_type_string,
             district=event.district.key if event.district else None,
             city=event.city,
             state_prov=event.state_prov,
@@ -81,6 +88,17 @@ def upsert_events(events: list[EventSimple]):
             start_date=event.start_date,
             end_date=event.end_date,
             year=event.year,
+            short_name=event.short_name,
+            week=event.week,
+            address=event.address,
+            postal_code=event.postal_code,
+            gmaps_url=event.gmaps_url,
+            lat=event.lat,
+            lng=event.lng,
+            location_name=event.location_name,
+            timezone=event.timezone,
+            first_event_code=event.first_event_code,
+            playoff_type=event.playoff_type_string,
         )
         for event in events
     ]
@@ -88,6 +106,17 @@ def upsert_events(events: list[EventSimple]):
     supabase.table("events").upsert(
         [event.model_dump() for event in db_events]
     ).execute()
+
+    db_event_divisions = [
+        EventDivision(
+            parent_event_key=event.key,
+            division_event_key=division_key,
+        )
+        for event in events
+        for division_key in event.division_keys
+    ]
+
+    _upsert_event_divisions(db_event_divisions)
 
 
 def upsert_event_matches(matches: list[MatchSimple]):
@@ -208,7 +237,7 @@ def get_tba_page_etag(
 
     response = (
         supabase.table("tba-pages-etags")
-        .select("etag", "endpoint", "page_num")
+        .select("etag", "endpoint", "page_num", "year")
         .eq("page_num", page_num)
         .eq("endpoint", endpoint)
         .eq("year", year)

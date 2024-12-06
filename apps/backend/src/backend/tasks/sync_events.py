@@ -2,7 +2,7 @@ import os
 
 import requests
 from models.db.tba_page_etag import TBAPageEtag
-from models.tba.event_simple import EventSimple
+from models.tba.event import Event
 from prefect import task
 from services.db_service import (
     get_tba_page_etag,
@@ -24,7 +24,7 @@ def prepare_event_headers(year: int):
 
 @task
 def fetch_event_data(headers, year: int):
-    url = f"https://www.thebluealliance.com/api/v3/events/{year}/simple"
+    url = f"https://www.thebluealliance.com/api/v3/events/{year}"
     return requests.get(url, headers=headers)
 
 
@@ -39,11 +39,11 @@ def process_event_response(response):
               response.status_code}"
         )
         return None
-    return [EventSimple(**event) for event in response.json()]
+    return [Event(**event) for event in response.json()]
 
 
 @task
-def filter_offseasons(events: list[EventSimple]):
+def filter_offseasons(events: list[Event]):
     return [
         event
         for event in events
