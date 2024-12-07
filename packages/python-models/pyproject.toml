@@ -1,15 +1,21 @@
 [project]
-name = "models"
+name = "python-models"
 version = "0.1.0"
-description = "Python Pydantic models that are shared between the API and the backend."
+description = "Shared Python Pydantic models for Python apps in the monorepo."
 authors = [
     {name = "Siddharth Rao", email = "siddrao.926@gmail.com"},
 ]
-dependencies = ["isort>=5.13.2", "black>=24.10.0", "flake8>=7.1.1"]
+dependencies = ["pydantic>=2.10.3"]
 requires-python = ">=3.13"
 readme = "README.md"
 license = {text = "MIT"}
 
+[project.optional-dependencies]
+lint = [
+    "isort>=5.13.2",
+    "black>=24.10.0",
+    "flake8>=7.1.1",
+]
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
