@@ -44,10 +44,18 @@ def process_event_response(response):
 
 @task
 def filter_offseasons(events: list[Event]):
-    
-    event_blacklist = ["2020dar", "2020carv", "2020gal", "2020hop", "2020new", "2020roe", "2020tur"]
-    
-    events =  [
+
+    event_blacklist = [
+        "2020dar",
+        "2020carv",
+        "2020gal",
+        "2020hop",
+        "2020new",
+        "2020roe",
+        "2020tur",
+    ]
+
+    events = [
         event
         for event in events
         if event.event_type != 99
@@ -55,34 +63,41 @@ def filter_offseasons(events: list[Event]):
         and event.event_type != -1
         and event.event_type != 7
     ]
-    
+
     for event in events:
         if event.key in event_blacklist:
             events.remove(event)
-        
+
         event.division_keys = [
             key for key in event.division_keys if key not in event_blacklist
         ]
-    
+
     return events
 
 
 @task
 def upsert_event_data(events, response, year: int):
-    if events:
-        upsert_events(events)
-        print(f"Events: Fetched {len(events)} events.")
-        
     if response.status_code == 200:
+        existing_etag = get_tba_page_etag(
+            page_num=None,
+            year=year,
+            endpoint="events",
+        )
+
         etag = response.headers.get("ETag")
         upsert_tba_page_etag(
             TBAPageEtag(
+                id=existing_etag.id if existing_etag else None,
                 page_num=None,
                 year=year,
                 endpoint="events",
                 etag=etag,
             )
         )
+
+    if events:
+        upsert_events(events)
+        print(f"Events: Fetched {len(events)} events.")
 
 
 @task(

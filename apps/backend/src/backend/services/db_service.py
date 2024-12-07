@@ -61,10 +61,10 @@ def _upsert_districts(districts: list[District]):
 
 
 def _upsert_event_divisions(event_divisions: list[EventDivision]):
-    
+
     if len(event_divisions) == 0:
         return
-    
+
     supabase.table("event-divisions").upsert(
         [event_division.model_dump() for event_division in event_divisions]
     ).execute()
@@ -243,8 +243,17 @@ def upsert_event_matches(matches: list[TBAMatch]):
 
 
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
+    etag_data = etag.model_dump()
 
-    supabase.table("tba-pages-etags").upsert([etag.model_dump()]).execute()
+    if etag.id:
+        etag_data["id"] = etag.id
+    else:
+        etag_data.pop("id")
+
+    supabase.table("tba-pages-etags").upsert(
+        [etag_data],
+        on_conflict="id",
+    ).execute()
 
 
 def get_tba_page_etag(
@@ -253,15 +262,15 @@ def get_tba_page_etag(
 
     response = (
         supabase.table("tba-pages-etags")
-        .select("etag", "endpoint", "page_num", "year")
+        .select("id", "etag", "endpoint", "page_num", "year")
         .eq("endpoint", endpoint)
         .eq("year", year)
         .limit(1)
     )
-    
-    if page_num:
+
+    if page_num is not None:
         response = response.eq("page_num", page_num)
-        
+
     response = response.execute()
 
     if len(response.data) == 0:
@@ -269,6 +278,7 @@ def get_tba_page_etag(
 
     etag_data = response.data[0]
     return TBAPageEtag(
+        id=etag_data["id"],
         page_num=etag_data["page_num"],
         etag=etag_data["etag"],
         endpoint=etag_data["endpoint"],

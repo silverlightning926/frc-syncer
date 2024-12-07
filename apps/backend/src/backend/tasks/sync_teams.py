@@ -46,20 +46,25 @@ def process_team_page_response(page_num, response):
 
 @task
 def upsert_team_data(page_num, teams, response, year: int):
-    if teams:
-        upsert_teams(teams)
-        print(f"Team Page {page_num}: Fetched {len(teams)} teams.")
-        
     if response.status_code == 200:
+        existing_etag = get_tba_page_etag(
+            page_num=page_num, year=year, endpoint="teams"
+        )
+
         etag = response.headers.get("ETag")
         upsert_tba_page_etag(
             TBAPageEtag(
+                id=existing_etag.id if existing_etag else None,
                 page_num=page_num,
                 etag=etag,
                 endpoint="teams",
                 year=year,
             )
         )
+
+    if teams:
+        upsert_teams(teams)
+        print(f"Team Page {page_num}: Fetched {len(teams)} teams.")
 
 
 @task
