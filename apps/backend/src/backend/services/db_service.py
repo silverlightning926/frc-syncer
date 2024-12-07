@@ -3,17 +3,15 @@ from datetime import datetime
 from json import dumps
 
 from dotenv import load_dotenv
-from models.db.alliance import Alliance
-from models.db.alliance_team import AllianceTeam
-from models.db.event import Event as DBEvent
-from models.db.event_division import EventDivision
-from models.db.match import Match as DBMatch
-from models.db.tba_page_etag import TBAPageEtag
-from models.db.team import Team
 from models.tba.district import District
 from models.tba.event import Event as TBAEvent
 from models.tba.match import Match as TBAMatch
 from models.tba.team_simple import TeamSimple
+from python_models.db import Alliance, AllianceTeam
+from python_models.db import Event as DBEvent
+from python_models.db import EventDivision
+from python_models.db import Match as DBMatch
+from python_models.db import TBAPageEtag, Team
 from supabase import Client, create_client
 
 load_dotenv()

@@ -2,9 +2,9 @@ import os
 import time
 
 import requests
-from models.db.tba_page_etag import TBAPageEtag
 from models.tba.team_simple import TeamSimple
 from prefect import task
+from python_models.db.tba_page_etag import TBAPageEtag
 from services.db_service import (
     get_tba_page_etag,
     upsert_tba_page_etag,
