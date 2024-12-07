@@ -44,10 +44,7 @@ def process_team_page_response(page_num, response):
     return [Team.from_tba(item) for item in response.json()]
 
 
-@task(
-    retries=3,
-    retry_delay_seconds=15
-)
+@task(retries=3, retry_delay_seconds=15)
 def upsert_team_data(page_num, teams, response, year: int):
     if teams:
         upsert_teams(teams)

@@ -29,7 +29,11 @@ def upsert_teams(teams: list[Team]):
 
 def get_event_keys_for_year(year: int) -> list[str]:
     response = (
-        supabase.table("events").select("key").eq("year", year).order("key").execute()
+        supabase.table("events")
+        .select("key")
+        .eq("year", year)
+        .order("key")
+        .execute()
     )
     return [event["key"] for event in response.data]
 
