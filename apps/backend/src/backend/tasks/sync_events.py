@@ -77,7 +77,10 @@ def filter_offseasons(events: list[Event]):
     return events
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15
+)
 def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)

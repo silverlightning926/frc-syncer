@@ -52,7 +52,10 @@ def process_event_teams_response(response):
     return [Match.from_tba(match) for match in response.json()]
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15
+)
 def upsert_event_matches_data(event_key, matches, response, year: int):
     if matches:
         upsert_event_matches(matches)
@@ -116,7 +119,7 @@ def sync_event_matches(event_key: str, year: int):
     name="Fetch Event Matches",
     description="Fetches all matches for all events.",
     tags=["tba"],
-    version="1.0",
+    version="1.0"
 )
 def sync_all_event_matches(year: int):
     event_keys = get_event_keys_for_year(year=year)

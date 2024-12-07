@@ -52,7 +52,10 @@ def process_event_rankings_response(response):
     return [Ranking.from_tba(rank) for rank in response.json()["rankings"]]
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15
+)
 def upsert_event_rankings_data(event_key, rankings, response, year: int):
     if rankings:
         upsert_event_rankings(rankings)
