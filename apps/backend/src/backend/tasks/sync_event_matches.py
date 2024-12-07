@@ -2,9 +2,9 @@ import os
 import time
 
 import requests
-from models.tba.match import Match
+from python_models.match import Match
 from prefect import task
-from python_models.db.tba_page_etag import TBAPageEtag
+from python_models.tba_page_etag import TBAPageEtag
 from services.db_service import (
     get_event_keys_for_year,
     get_tba_page_etag,
@@ -49,7 +49,7 @@ def process_event_teams_response(response):
         )
         return None
 
-    return [Match(**match) for match in response.json()]
+    return [Match.from_tba(match) for match in response.json()]
 
 
 @task
@@ -83,18 +83,13 @@ def filter_matches(matches: list[Match]):
     filtered_matches = []
 
     for match in matches:
-        should_exclude = any(
-            any(
-                team_key in alliance.team_keys
-                or team_key in alliance.surrogate_team_keys
-                or team_key in alliance.dq_team_keys
-                for team_key in teams_blacklist
-            )
-            for alliance in match.alliances.values()
-        )
-
-        if not should_exclude:
-            filtered_matches.append(match)
+        for alliance in match.alliances:
+            alliance.teams = [
+                team
+                for team in alliance.teams
+                if team.team_key not in teams_blacklist
+            ]
+        filtered_matches.append(match)
 
     return filtered_matches
 

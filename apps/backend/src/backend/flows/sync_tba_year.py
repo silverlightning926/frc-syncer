@@ -2,7 +2,7 @@ from time import sleep
 
 from prefect import flow, task
 from services.db_service import insert_sync_timestamp
-# from tasks.sync_event_matches import sync_all_event_matches
+from tasks.sync_event_matches import sync_all_event_matches
 from tasks.sync_events import fetch_events
 from tasks.sync_teams import fetch_teams
 
@@ -23,12 +23,12 @@ def log_sync_timestamp(year: int):
     version="1.0",
 )
 def sync_tba_data_for_year(year: int):
-    #fetch_teams(year=year)
+    fetch_teams(year=year)
 
     fetch_events(year=year)
 
-    # sync_all_event_matches(year=year)
+    sync_all_event_matches(year=year)
 
-    # throttle_request()
+    throttle_request()
 
-    # log_sync_timestamp(year=year)
+    log_sync_timestamp(year=year)
