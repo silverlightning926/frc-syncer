@@ -6,6 +6,9 @@ from pydantic import BaseModel
 class EventDivision(BaseModel):
     parent_event_key: str
     division_event_key: str
+    
+    def to_db(self):
+        return self.model_dump()
 
 
 class District(BaseModel):
@@ -22,6 +25,9 @@ class District(BaseModel):
             key=district["key"],
             year=district["year"],
         )
+        
+    def to_db(self):
+        return self.model_dump()
 
 
 class Event(BaseModel):
@@ -65,7 +71,7 @@ class Event(BaseModel):
             week=event["week"],
             location_name=event["location_name"],
             timezone=event["timezone"],
-            playoff_type=event["playoff_type"],
+            playoff_type=event["playoff_type_string"],
             divisions=[
                 EventDivision(
                     parent_event_key=event["key"], division_event_key=division
@@ -75,12 +81,7 @@ class Event(BaseModel):
         )
 
     def to_db(self):
-        event_db_object = self.model_dump(exclude={"divisions", "district"})
-        if self.district:
-            event_db_object["district_key"] = self.district.key
+        result = self.model_dump(exclude={"divisions", "district"})
+        result.update({"district_key": self.district.key if self.district else None})
+        return result
 
-        return (
-            event_db_object,
-            self.district.model_dump() if self.district else None,
-            [division.model_dump() for division in self.divisions],
-        )
