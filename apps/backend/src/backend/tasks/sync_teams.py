@@ -2,10 +2,14 @@ import os
 import time
 
 import requests
-from python_models.team import Team
 from prefect import task
 from python_models.tba_page_etag import TBAPageEtag
-from services.db_service import get_tba_page_etag, upsert_tba_page_etag, upsert_teams
+from python_models.team import Team
+from services.db_service import (
+    get_tba_page_etag,
+    upsert_tba_page_etag,
+    upsert_teams,
+)
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 

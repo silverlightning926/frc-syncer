@@ -1,13 +1,10 @@
 import os
 from datetime import datetime
-from json import dumps
-import pprint
-
 from dotenv import load_dotenv
-from python_models.team import Team
-from python_models.tba_page_etag import TBAPageEtag
 from python_models.event import Event
 from python_models.match import Match
+from python_models.tba_page_etag import TBAPageEtag
+from python_models.team import Team
 from supabase import Client, create_client
 
 load_dotenv()
@@ -24,8 +21,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 def upsert_teams(teams: list[Team]):
 
     supabase.table("teams").upsert(
-        [team.to_db()
-        for team in teams],
+        [team.to_db() for team in teams],
     ).execute()
 
 
@@ -35,32 +31,50 @@ def get_event_keys_for_year(year: int) -> list[str]:
     )
     return [event["key"] for event in response.data]
 
+
 def upsert_events(events: list[Event]):
     supabase.table("districts").upsert(
-        [district.to_db() for district in {district.key: district for district in [event.district for event in events if event.district]}.values()],
+        [
+            district.to_db()
+            for district in {
+                district.key: district
+                for district in [
+                    event.district for event in events if event.district
+                ]
+            }.values()
+        ],
     ).execute()
 
     supabase.table("events").upsert(
         [event.to_db() for event in events]
     ).execute()
-    
+
     supabase.table("event-divisions").upsert(
         [division.to_db() for event in events for division in event.divisions]
     ).execute()
 
 
 def upsert_event_matches(matches: list[Match]):
-    
+
     supabase.table("matches").upsert(
         [match.to_db() for match in matches],
     ).execute()
-    
+
     supabase.table("alliances").upsert(
-        [alliance.to_db() for match in matches for alliance in match.alliances],
+        [
+            alliance.to_db()
+            for match in matches
+            for alliance in match.alliances
+        ],
     ).execute()
-    
+
     supabase.table("alliance-teams").upsert(
-        [team.to_db() for match in matches for alliance in match.alliances for team in alliance.teams],
+        [
+            team.to_db()
+            for match in matches
+            for alliance in match.alliances
+            for team in alliance.teams
+        ],
     ).execute()
 
 
