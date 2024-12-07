@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+
 from dotenv import load_dotenv
 from python_models.event import Event
 from python_models.match import Match

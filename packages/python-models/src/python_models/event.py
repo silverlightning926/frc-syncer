@@ -2,16 +2,18 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+
 class EventDivision(BaseModel):
     parent_event_key: str
     division_event_key: str
+
 
 class District(BaseModel):
     abbreviation: str
     display_name: str
     key: str
     year: int
-        
+
     @classmethod
     def from_tba(cls, district: dict) -> "District":
         return cls(
@@ -20,6 +22,7 @@ class District(BaseModel):
             key=district["key"],
             year=district["year"],
         )
+
 
 class Event(BaseModel):
     key: str
@@ -47,7 +50,11 @@ class Event(BaseModel):
             name=event["name"],
             event_code=event["event_code"],
             event_type=event["event_type_string"],
-            district=District.from_tba(event["district"]) if event["district"] else None,
+            district=(
+                District.from_tba(event["district"])
+                if event["district"]
+                else None
+            ),
             city=event["city"],
             state_prov=event["state_prov"],
             country=event["country"],
@@ -59,14 +66,21 @@ class Event(BaseModel):
             location_name=event["location_name"],
             timezone=event["timezone"],
             playoff_type=event["playoff_type"],
-            divisions=[EventDivision(parent_event_key=event["key"], division_event_key=division) for division in event.get("division_keys", [])]
+            divisions=[
+                EventDivision(
+                    parent_event_key=event["key"], division_event_key=division
+                )
+                for division in event.get("division_keys", [])
+            ],
         )
-    
+
     def to_db(self):
         event_db_object = self.model_dump(exclude={"divisions", "district"})
         if self.district:
             event_db_object["district_key"] = self.district.key
-    
-        return event_db_object, \
-            self.district.model_dump() if self.district else None, \
-            [division.model_dump() for division in self.divisions]
+
+        return (
+            event_db_object,
+            self.district.model_dump() if self.district else None,
+            [division.model_dump() for division in self.divisions],
+        )

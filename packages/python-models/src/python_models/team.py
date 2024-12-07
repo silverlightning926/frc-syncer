@@ -11,7 +11,7 @@ class Team(BaseModel):
     state_prov: Optional[str] = None
     country: Optional[str] = None
     rookie_year: Optional[int] = None
-    
+
     @classmethod
     def from_tba(cls, team: dict) -> "Team":
         return cls(
@@ -23,6 +23,6 @@ class Team(BaseModel):
             country=team["country"],
             rookie_year=team["rookie_year"],
         )
-        
+
     def to_db(self):
         return self.model_dump()
