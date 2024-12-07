@@ -83,7 +83,7 @@ def upsert_event_rankings_data(event_key, rankings, response, year: int):
 
 
 @task
-def throttle_request(interval_secs=15):
+def throttle_request(interval_secs=5):
     time.sleep(interval_secs)
 
 
