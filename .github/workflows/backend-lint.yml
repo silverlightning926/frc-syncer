@@ -28,7 +28,7 @@ jobs:
             - name: Cache PDM Dependencies
               uses: actions/cache@v4.1.2
               with:
-                  path: ~/.cache/pdm
+                  path: ~/.cache/pdm/backend
                   key: ${{ runner.os }}-pdm-${{ hashFiles('apps/backend/pdm.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-pdm-
