@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"postinstall": "pdm install",
-		"dev": "nodemon --exec pdm run src/backend/main.py --ext py,json,toml",
+		"dev": "nodemon --exec pdm run src/backend/download_historic.py --ext py,json,toml",
 		"start": "pdm run src/backend/download_historic.py",
 		"lint": "pdm run isort src && pdm run black src && pdm run flake8 src"
 	},
