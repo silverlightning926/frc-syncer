@@ -38,7 +38,7 @@ def fetch_event_rankings_page_data(
 
 
 @task
-def process_event_rankings_response(response):
+def process_event_rankings_response(response, event_key: str):
     if response.status_code == 304:
         print("Event Rankings: ETAG match. Skipping.")
         return None
@@ -49,7 +49,7 @@ def process_event_rankings_response(response):
         )
         return None
 
-    return [Ranking.from_tba(rank) for rank in response.json()["rankings"]]
+    return [Ranking.from_tba(rank, event_key) for rank in response.json()["rankings"]]
 
 
 @task(
@@ -91,7 +91,7 @@ def throttle_request(interval_secs=15):
 def sync_event_ranks(event_key: str, year: int):
     headers = prepare_event_matches_headers(event_key, year)
     response = fetch_event_rankings_page_data(event_key, headers)
-    rankings = process_event_rankings_response(response)
+    rankings = process_event_rankings_response(response, event_key)
     upsert_event_rankings_data(event_key, rankings, response, year)
     throttle_request()
 
