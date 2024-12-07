@@ -71,14 +71,18 @@ def filter_offseasons(events: list[Event]):
 def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)
-        new_etag = TBAPageEtag(
-            page_num=None,
-            etag=response.headers.get("ETag"),
-            endpoint="events",
-            year=year,
-        )
-        upsert_tba_page_etag(new_etag)
         print(f"Events: Fetched {len(events)} events.")
+        
+    if response.status_code == 200:
+        etag = response.headers.get("ETag")
+        upsert_tba_page_etag(
+            TBAPageEtag(
+                page_num=None,
+                year=year,
+                endpoint="events",
+                etag=etag,
+            )
+        )
 
 
 @task(
