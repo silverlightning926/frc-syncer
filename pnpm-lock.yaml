@@ -24,11 +24,7 @@ importers:
         specifier: ^3.1.7
         version: 3.1.7
 
-  packages/models:
-    devDependencies:
-      nodemon:
-        specifier: ^3.1.7
-        version: 3.1.7
+  packages/models: {}
 
 packages:
 
