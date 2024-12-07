@@ -45,7 +45,7 @@ def process_event_response(response):
 @task
 def filter_offseasons(events: list[Event]):
     
-    event_blacklist = ["2020dar"]
+    event_blacklist = ["2020dar", "2020carv", "2020gal", "2020hop", "2020new", "2020roe", "2020tur"]
     
     events =  [
         event

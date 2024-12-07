@@ -61,6 +61,10 @@ def _upsert_districts(districts: list[District]):
 
 
 def _upsert_event_divisions(event_divisions: list[EventDivision]):
+    
+    if len(event_divisions) == 0:
+        return
+    
     supabase.table("event-divisions").upsert(
         [event_division.model_dump() for event_division in event_divisions]
     ).execute()
