@@ -58,10 +58,12 @@ def filter_offseasons(events: list[Event]):
     events = [
         event
         for event in events
-        if event.event_type != 99
-        and event.event_type != 100
-        and event.event_type != -1
-        and event.event_type != 7
+        if event.event_type != "Offseason"
+        and event.event_type != "Preseason"
+        and event.event_type != "Unlabeled"
+        and event.event_type != "Unknown"
+        and event.event_type != "Remote"
+        and event.event_type != "--"
     ]
 
     for event in events:
