@@ -6,6 +6,7 @@ from python_models.event import Event
 from python_models.match import Match
 from python_models.tba_page_etag import TBAPageEtag
 from python_models.team import Team
+from python_models.ranking import Ranking
 from supabase import Client, create_client
 
 load_dotenv()
@@ -78,6 +79,10 @@ def upsert_event_matches(matches: list[Match]):
         ],
     ).execute()
 
+def upsert_event_rankings(rankings: list[Ranking]):
+    supabase.table("rankings").upsert(
+        [ranking.to_db() for ranking in rankings],
+    ).execute()
 
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     etag_data = etag.model_dump()
