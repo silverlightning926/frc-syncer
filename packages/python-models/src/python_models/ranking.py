@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 
-from python_models import event
 
 class Ranking(BaseModel):
     event_key: str
@@ -12,8 +11,8 @@ class Ranking(BaseModel):
         return cls(
             event_key=rankings["event_key"],
             team_key=rankings["team_key"],
-            rank=rankings["rank"]
+            rank=rankings["rank"],
         )
-        
+
     def to_db(self):
         return self.model_dump()

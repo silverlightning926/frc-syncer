@@ -19,7 +19,7 @@ class AllianceTeam(BaseModel):
             team_key=team_key,
             alliance_key=f"{match_key}_{alliance}",
         )
-        
+
     def to_db(self):
         return self.model_dump()
 
@@ -48,12 +48,14 @@ class Alliance(BaseModel):
             score_breakdown=score_breakdown,
             teams=[
                 AllianceTeam.from_tba(team_key, color, match_key)
-                for team_key in (alliance_data.get("team_keys", [])
-                + alliance_data.get("surrogate_team_keys", [])
-                + alliance_data.get("dq_team_keys", []))
+                for team_key in (
+                    alliance_data.get("team_keys", [])
+                    + alliance_data.get("surrogate_team_keys", [])
+                    + alliance_data.get("dq_team_keys", [])
+                )
             ],
         )
-        
+
     def to_db(self):
         return self.model_dump(exclude={"teams"})
 

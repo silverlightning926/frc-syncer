@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class EventDivision(BaseModel):
     parent_event_key: str
     division_event_key: str
-    
+
     def to_db(self):
         return self.model_dump()
 
@@ -25,7 +25,7 @@ class District(BaseModel):
             key=district["key"],
             year=district["year"],
         )
-        
+
     def to_db(self):
         return self.model_dump()
 
@@ -82,6 +82,7 @@ class Event(BaseModel):
 
     def to_db(self):
         result = self.model_dump(exclude={"divisions", "district"})
-        result.update({"district_key": self.district.key if self.district else None})
+        result.update(
+            {"district_key": self.district.key if self.district else None}
+        )
         return result
-
