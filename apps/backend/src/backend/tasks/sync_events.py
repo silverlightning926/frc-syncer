@@ -1,9 +1,9 @@
 import os
 
 import requests
-from models.tba.event import Event
+from python_models.event import Event
 from prefect import task
-from python_models.db.tba_page_etag import TBAPageEtag
+from python_models.tba_page_etag import TBAPageEtag
 from services.db_service import get_tba_page_etag, upsert_events, upsert_tba_page_etag
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
@@ -35,7 +35,7 @@ def process_event_response(response):
               response.status_code}"
         )
         return None
-    return [Event(**event) for event in response.json()]
+    return [Event.from_tba(item) for item in response.json()]
 
 
 @task
@@ -63,9 +63,9 @@ def filter_offseasons(events: list[Event]):
     for event in events:
         if event.key in event_blacklist:
             events.remove(event)
-
-        event.division_keys = [
-            key for key in event.division_keys if key not in event_blacklist
+        
+        event.divisions = [
+            division for division in event.divisions if division not in event_blacklist
         ]
 
     return events

@@ -2,9 +2,9 @@ import os
 import time
 
 import requests
-from models.tba.team_simple import TeamSimple
+from python_models.team import Team
 from prefect import task
-from python_models.db.tba_page_etag import TBAPageEtag
+from python_models.tba_page_etag import TBAPageEtag
 from services.db_service import get_tba_page_etag, upsert_tba_page_etag, upsert_teams
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
@@ -22,7 +22,7 @@ def prepare_team_headers(page_num, year: int):
 @task
 def fetch_team_page_data(page_num, headers, year: int):
     url = f"https://www.thebluealliance.com/api/v3/teams/{
-        year}/{page_num}/simple"
+        year}/{page_num}"
     return requests.get(url, headers=headers)
 
 
@@ -37,7 +37,7 @@ def process_team_page_response(page_num, response):
               response.status_code}"
         )
         return None
-    return [TeamSimple(**team) for team in response.json()]
+    return [Team.from_tba(item) for item in response.json()]
 
 
 @task
