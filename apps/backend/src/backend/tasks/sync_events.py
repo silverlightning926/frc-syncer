@@ -44,7 +44,10 @@ def process_event_response(response):
 
 @task
 def filter_offseasons(events: list[Event]):
-    return [
+    
+    event_blacklist = ["2020dar"]
+    
+    events =  [
         event
         for event in events
         if event.event_type != 99
@@ -52,6 +55,16 @@ def filter_offseasons(events: list[Event]):
         and event.event_type != -1
         and event.event_type != 7
     ]
+    
+    for event in events:
+        if event.key in event_blacklist:
+            events.remove(event)
+        
+        event.division_keys = [
+            key for key in event.division_keys if key not in event_blacklist
+        ]
+    
+    return events
 
 
 @task
