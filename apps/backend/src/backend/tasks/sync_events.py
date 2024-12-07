@@ -4,11 +4,7 @@ import requests
 from models.tba.event import Event
 from prefect import task
 from python_models.db.tba_page_etag import TBAPageEtag
-from services.db_service import (
-    get_tba_page_etag,
-    upsert_events,
-    upsert_tba_page_etag,
-)
+from services.db_service import get_tba_page_etag, upsert_events, upsert_tba_page_etag
 
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
