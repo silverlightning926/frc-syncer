@@ -252,7 +252,6 @@ def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
 
     supabase.table("tba-pages-etags").upsert(
         [etag_data],
-        on_conflict="id",
     ).execute()
 
 
