@@ -72,26 +72,36 @@ def upsert_events(events: list[Event]):
 
 def upsert_event_matches(matches: list[Match]):
 
-    supabase.table("matches").upsert(
-        [match.to_db() for match in matches],
-    ).execute()
+    new_matches = [match.to_db() for match in matches]
+    if new_matches:
+        supabase.table("matches").upsert(
+            new_matches,
+        ).execute()
+    else:
+        return
 
-    supabase.table("alliances").upsert(
-        [
+    new_alliances = [
             alliance.to_db()
             for match in matches
             for alliance in match.alliances
-        ],
-    ).execute()
+        ]
+    if new_alliances:
+        supabase.table("alliances").upsert(
+            new_alliances,
+        ).execute()
+    else:
+        return
 
-    supabase.table("alliance-teams").upsert(
-        [
+    new_alliance_teams = [
             team.to_db()
             for match in matches
             for alliance in match.alliances
             for team in alliance.teams
-        ],
-    ).execute()
+        ]
+    if new_alliance_teams:
+        supabase.table("alliance-teams").upsert(
+            new_alliance_teams,
+        ).execute()
 
 
 def upsert_event_rankings(rankings: list[Ranking]):
