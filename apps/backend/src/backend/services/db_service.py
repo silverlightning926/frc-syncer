@@ -2,11 +2,11 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-from python_models.event import Event
-from python_models.match import Match
-from python_models.ranking import Ranking
-from python_models.tba_page_etag import TBAPageEtag
-from python_models.team import Team
+from python_models.backend.event import Event
+from python_models.backend.match import Match
+from python_models.backend.ranking import Ranking
+from python_models.backend.tba_page_etag import TBAPageEtag
+from python_models.backend.team import Team
 from supabase import Client, create_client
 
 load_dotenv()

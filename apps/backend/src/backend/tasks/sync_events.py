@@ -2,8 +2,8 @@ import os
 
 import requests
 from prefect import task
-from python_models.event import Event
-from python_models.tba_page_etag import TBAPageEtag
+from python_models.backend.event import Event
+from python_models.backend.tba_page_etag import TBAPageEtag
 from services.db_service import (
     get_tba_page_etag,
     upsert_events,

@@ -3,8 +3,8 @@ import time
 
 import requests
 from prefect import task
-from python_models.match import Match
-from python_models.tba_page_etag import TBAPageEtag
+from python_models.backend.match import Match
+from python_models.backend.tba_page_etag import TBAPageEtag
 from services.db_service import (
     get_event_keys_for_year,
     get_tba_page_etag,
