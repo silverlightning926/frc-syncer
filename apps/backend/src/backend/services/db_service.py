@@ -39,25 +39,33 @@ def get_event_keys_for_year(year: int) -> list[str]:
 
 
 def upsert_events(events: list[Event]):
-    supabase.table("districts").upsert(
-        [
-            district.to_db()
-            for district in {
-                district.key: district
-                for district in [
-                    event.district for event in events if event.district
-                ]
-            }.values()
-        ],
-    ).execute()
+    new_districts = [
+        district.to_db()
+        for district in {
+            district.key: district
+            for district in [
+                event.district for event in events if event.district
+            ]
+        }.values()
+    ]
+    if new_districts:
+        supabase.table("districts").upsert(
+            new_districts,
+        ).execute()
 
-    supabase.table("events").upsert(
-        [event.to_db() for event in events]
-    ).execute()
+    new_events = [event.to_db() for event in events]
+    if new_events:
+        supabase.table("events").upsert(
+            new_events,
+        ).execute()
+    else:
+        return
 
-    supabase.table("event-divisions").upsert(
-        [division.to_db() for event in events for division in event.divisions]
-    ).execute()
+    new_event_divisions = [division.to_db() for event in events for division in event.divisions]
+    if new_event_divisions:
+        supabase.table("event-divisions").upsert(
+            new_event_divisions
+        ).execute()
 
 
 def upsert_event_matches(matches: list[Match]):
