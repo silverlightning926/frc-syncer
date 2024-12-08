@@ -105,10 +105,11 @@ def upsert_event_matches(matches: list[Match]):
 
 
 def upsert_event_rankings(rankings: list[Ranking]):
-    supabase.table("rankings").upsert(
-        [ranking.to_db() for ranking in rankings],
-    ).execute()
-
+    new_rankings = [ranking.to_db() for ranking in rankings]
+    if new_rankings:
+        supabase.table("rankings").upsert(
+            new_rankings,
+        ).execute()
 
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     etag_data = etag.model_dump()
