@@ -13,7 +13,10 @@ from services.db_service import (
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def prepare_event_headers(year: int):
     etag = get_tba_page_etag(page_num=None, year=year, endpoint="events")
     headers = HEADERS.copy()
@@ -22,13 +25,19 @@ def prepare_event_headers(year: int):
     return headers
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def fetch_event_data(headers, year: int):
     url = f"https://www.thebluealliance.com/api/v3/events/{year}"
     return requests.get(url, headers=headers)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def process_event_response(response):
     if response.status_code == 304:
         print("Events: ETAG match. Skipping.")
@@ -42,7 +51,10 @@ def process_event_response(response):
     return [Event.from_tba(item) for item in response.json()]
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def filter_offseasons(events: list[Event]):
 
     event_blacklist = [
@@ -79,7 +91,10 @@ def filter_offseasons(events: list[Event]):
     return events
 
 
-@task(retries=3, retry_delay_seconds=15)
+@task(
+    retries=3, 
+    retry_delay_seconds=15
+)
 def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)
@@ -109,6 +124,8 @@ def upsert_event_data(events, response, year: int):
     description="Fetches all events for the current season.",
     tags=["tba"],
     version="1.0",
+    retries=3,
+    retry_delay_seconds=15,
 )
 def fetch_events(year: int):
     headers = prepare_event_headers(year)

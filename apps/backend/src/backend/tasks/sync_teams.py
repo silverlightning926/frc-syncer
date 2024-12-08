@@ -14,7 +14,10 @@ from services.db_service import (
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def prepare_team_headers(page_num, year: int):
     etag = get_tba_page_etag(page_num=page_num, year=year, endpoint="teams")
     headers = HEADERS.copy()
@@ -23,14 +26,20 @@ def prepare_team_headers(page_num, year: int):
     return headers
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def fetch_team_page_data(page_num, headers, year: int):
     url = f"https://www.thebluealliance.com/api/v3/teams/{
         year}/{page_num}"
     return requests.get(url, headers=headers)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def process_team_page_response(page_num, response):
     if response.status_code == 304:
         print(f"Teams Page {page_num}: ETAG match. Skipping.")
@@ -44,7 +53,10 @@ def process_team_page_response(page_num, response):
     return [Team.from_tba(item) for item in response.json()]
 
 
-@task(retries=3, retry_delay_seconds=15)
+@task(
+    retries=3, 
+    retry_delay_seconds=15
+)
 def upsert_team_data(page_num, teams, response, year: int):
     if teams:
         upsert_teams(teams)
@@ -67,7 +79,10 @@ def upsert_team_data(page_num, teams, response, year: int):
         )
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def throttle_request(interval_secs=5):
     time.sleep(interval_secs)
 
@@ -77,6 +92,9 @@ def throttle_request(interval_secs=5):
     description="Fetches all teams for the current season.",
     tags=["tba"],
     version="1.0",
+    retries=3,
+    retry_delay_seconds=15,
+    
 )
 def fetch_teams(year: int):
     page_num = 0

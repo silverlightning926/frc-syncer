@@ -15,8 +15,10 @@ from services.db_service import (
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
-@task
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def prepare_event_matches_headers(event_key, year: int):
     etag = get_tba_page_etag(
         page_num=None,
@@ -29,7 +31,10 @@ def prepare_event_matches_headers(event_key, year: int):
     return headers
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def fetch_event_rankings_page_data(
     event_key: str, headers
 ) -> requests.Response:
@@ -37,7 +42,10 @@ def fetch_event_rankings_page_data(
     return requests.get(url, headers=headers)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def process_event_rankings_response(response, event_key: str):
     if response.status_code == 304:
         print("Event Rankings: ETAG match. Skipping.")
@@ -55,7 +63,10 @@ def process_event_rankings_response(response, event_key: str):
     ]
 
 
-@task(retries=3, retry_delay_seconds=15)
+@task(
+    retries=3, 
+    retry_delay_seconds=15
+)
 def upsert_event_rankings_data(event_key, rankings, response, year: int):
     if rankings:
         upsert_event_rankings(rankings)
@@ -82,12 +93,18 @@ def upsert_event_rankings_data(event_key, rankings, response, year: int):
         )
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def throttle_request(interval_secs=5):
     time.sleep(interval_secs)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def sync_event_ranks(event_key: str, year: int):
     headers = prepare_event_matches_headers(event_key, year)
     response = fetch_event_rankings_page_data(event_key, headers)
@@ -101,6 +118,8 @@ def sync_event_ranks(event_key: str, year: int):
     description="Syncs all event rankings for a given year",
     tags=["tba"],
     version="1.0",
+    retries=3,
+    retry_delay_seconds=15,
 )
 def sync_all_event_rankings(year: int):
     event_keys = get_event_keys_for_year(year=year)

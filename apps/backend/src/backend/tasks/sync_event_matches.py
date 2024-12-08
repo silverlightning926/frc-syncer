@@ -15,7 +15,10 @@ from services.db_service import (
 HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def prepare_event_matches_headers(event_key, year: int):
     etag = get_tba_page_etag(
         page_num=None,
@@ -28,7 +31,10 @@ def prepare_event_matches_headers(event_key, year: int):
     return headers
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def fetch_event_matches_page_data(
     event_key: str, headers
 ) -> requests.Response:
@@ -37,7 +43,10 @@ def fetch_event_matches_page_data(
     return requests.get(url, headers=headers)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def process_event_teams_response(response):
     if response.status_code == 304:
         print("Event Matches: ETAG match. Skipping.")
@@ -52,7 +61,10 @@ def process_event_teams_response(response):
     return [Match.from_tba(match) for match in response.json()]
 
 
-@task(retries=3, retry_delay_seconds=15)
+@task(
+    retries=3, 
+    retry_delay_seconds=15
+)
 def upsert_event_matches_data(event_key, matches, response, year: int):
     if matches:
         upsert_event_matches(matches)
@@ -77,7 +89,10 @@ def upsert_event_matches_data(event_key, matches, response, year: int):
         )
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def filter_matches(matches: list[Match]):
     teams_blacklist: list[str] = ["frc0"]
     filtered_matches = []
@@ -94,12 +109,18 @@ def filter_matches(matches: list[Match]):
     return filtered_matches
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def throttle_request(interval_secs=15):
     time.sleep(interval_secs)
 
 
-@task
+@task(
+    retries=3,
+    retry_delay_seconds=15,
+)
 def sync_event_matches(event_key: str, year: int):
     headers = prepare_event_matches_headers(event_key, year)
     response = fetch_event_matches_page_data(event_key, headers)
@@ -117,6 +138,8 @@ def sync_event_matches(event_key: str, year: int):
     description="Fetches all matches for all events.",
     tags=["tba"],
     version="1.0",
+    retries=3,
+    retry_delay_seconds=15,
 )
 def sync_all_event_matches(year: int):
     event_keys = get_event_keys_for_year(year=year)
