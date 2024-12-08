@@ -22,9 +22,11 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def upsert_teams(teams: list[Team]):
 
-    supabase.table("teams").upsert(
-        [team.to_db() for team in teams],
-    ).execute()
+    new_teams = [team.to_db() for team in teams]
+    if new_teams:
+        supabase.table("teams").upsert(
+            new_teams,
+        ).execute()
 
 
 def get_event_keys_for_year(year: int) -> list[str]:
