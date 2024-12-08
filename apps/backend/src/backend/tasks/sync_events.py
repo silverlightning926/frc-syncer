@@ -59,7 +59,7 @@ def process_event_response(response):
     retries=3,
     retry_delay_seconds=15,
 )
-def filter_offseasons(events: list[Event]):
+def filter_events(events: list[Event]):
 
     event_blacklist = [
         "2020dar",
@@ -89,7 +89,7 @@ def filter_offseasons(events: list[Event]):
         event.divisions = [
             division
             for division in event.divisions
-            if division not in event_blacklist
+            if division.division_event_key not in event_blacklist and division.parent_event_key not in event.key
         ]
 
     return events
@@ -138,6 +138,6 @@ def fetch_events(year: int):
     events = process_event_response(response)
 
     if events:
-        events = filter_offseasons(events)
+        events = filter_events(events)
 
     upsert_event_data(events, response, year)
