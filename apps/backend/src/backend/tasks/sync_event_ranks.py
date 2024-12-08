@@ -16,6 +16,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task(
+    name="Rank Sync: Prepare Headers",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -32,6 +33,7 @@ def prepare_event_matches_headers(event_key, year: int):
 
 
 @task(
+    name="Rank Sync: Fetch Event Rankings Data",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -43,6 +45,7 @@ def fetch_event_rankings_page_data(
 
 
 @task(
+    name="Rank Sync: Process Event Rankings Response",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -64,6 +67,7 @@ def process_event_rankings_response(response, event_key: str):
 
 
 @task(
+    name="Rank Sync: Upsert Event Rankings Data",
     retries=3, 
     retry_delay_seconds=15
 )
@@ -94,6 +98,7 @@ def upsert_event_rankings_data(event_key, rankings, response, year: int):
 
 
 @task(
+    name="Rank Sync: Throttle Request",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -102,6 +107,7 @@ def throttle_request(interval_secs=5):
 
 
 @task(
+    name="Rank Sync: Sync Event Ranks",
     retries=3,
     retry_delay_seconds=15,
 )

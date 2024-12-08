@@ -14,6 +14,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task(
+    name="Event Sync: Prepare Headers",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -26,6 +27,7 @@ def prepare_event_headers(year: int):
 
 
 @task(
+    name="Event Sync: Fetch Event Data",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -35,6 +37,7 @@ def fetch_event_data(headers, year: int):
 
 
 @task(
+    name="Event Sync: Process Event Response",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -52,6 +55,7 @@ def process_event_response(response):
 
 
 @task(
+    name="Event Sync: Filter Offseasons",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -92,6 +96,7 @@ def filter_offseasons(events: list[Event]):
 
 
 @task(
+    name="Event Sync: Upsert Event Data",
     retries=3, 
     retry_delay_seconds=15
 )

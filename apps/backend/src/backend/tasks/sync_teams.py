@@ -15,6 +15,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task(
+    name="Team Sync: Prepare Headers",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -27,6 +28,7 @@ def prepare_team_headers(page_num, year: int):
 
 
 @task(
+    name="Team Sync: Fetch Team Page Data",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -37,6 +39,7 @@ def fetch_team_page_data(page_num, headers, year: int):
 
 
 @task(
+    name="Team Sync: Process Team Page Response",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -54,6 +57,7 @@ def process_team_page_response(page_num, response):
 
 
 @task(
+    name="Team Sync: Upsert Team Data",
     retries=3, 
     retry_delay_seconds=15
 )
@@ -80,6 +84,7 @@ def upsert_team_data(page_num, teams, response, year: int):
 
 
 @task(
+    name="Team Sync: Throttle Request",
     retries=3,
     retry_delay_seconds=15,
 )

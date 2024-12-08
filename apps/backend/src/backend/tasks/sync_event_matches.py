@@ -16,6 +16,7 @@ HEADERS = {"X-TBA-Auth-Key": os.getenv("TBA_API_KEY")}
 
 
 @task(
+    name="Match Sync: Prepare Headers",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -32,6 +33,7 @@ def prepare_event_matches_headers(event_key, year: int):
 
 
 @task(
+    name="Match Sync: Fetch Event Matches Data",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -44,6 +46,7 @@ def fetch_event_matches_page_data(
 
 
 @task(
+    name="Match Sync: Process Event Matches Response",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -62,6 +65,7 @@ def process_event_teams_response(response):
 
 
 @task(
+    name="Match Sync: Upsert Event Matches Data",
     retries=3, 
     retry_delay_seconds=15
 )
@@ -90,6 +94,7 @@ def upsert_event_matches_data(event_key, matches, response, year: int):
 
 
 @task(
+    name="Match Sync: Filter Matches",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -110,6 +115,7 @@ def filter_matches(matches: list[Match]):
 
 
 @task(
+    name="Match Sync: Throttle Request",
     retries=3,
     retry_delay_seconds=15,
 )
@@ -118,6 +124,7 @@ def throttle_request(interval_secs=15):
 
 
 @task(
+    name="Match Sync: Sync Event Matches",
     retries=3,
     retry_delay_seconds=15,
 )
