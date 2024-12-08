@@ -63,11 +63,11 @@ def upsert_events(events: list[Event]):
     else:
         return
 
-    new_event_divisions = [division.to_db() for event in events for division in event.divisions]
+    new_event_divisions = [
+        division.to_db() for event in events for division in event.divisions
+    ]
     if new_event_divisions:
-        supabase.table("event-divisions").upsert(
-            new_event_divisions
-        ).execute()
+        supabase.table("event-divisions").upsert(new_event_divisions).execute()
 
 
 def upsert_event_matches(matches: list[Match]):
@@ -81,10 +81,8 @@ def upsert_event_matches(matches: list[Match]):
         return
 
     new_alliances = [
-            alliance.to_db()
-            for match in matches
-            for alliance in match.alliances
-        ]
+        alliance.to_db() for match in matches for alliance in match.alliances
+    ]
     if new_alliances:
         supabase.table("alliances").upsert(
             new_alliances,
@@ -93,11 +91,11 @@ def upsert_event_matches(matches: list[Match]):
         return
 
     new_alliance_teams = [
-            team.to_db()
-            for match in matches
-            for alliance in match.alliances
-            for team in alliance.teams
-        ]
+        team.to_db()
+        for match in matches
+        for alliance in match.alliances
+        for team in alliance.teams
+    ]
     if new_alliance_teams:
         supabase.table("alliance-teams").upsert(
             new_alliance_teams,
@@ -110,6 +108,7 @@ def upsert_event_rankings(rankings: list[Ranking]):
         supabase.table("rankings").upsert(
             new_rankings,
         ).execute()
+
 
 def upsert_tba_page_etag(etag: TBAPageEtag) -> None:
     etag_data = etag.model_dump()

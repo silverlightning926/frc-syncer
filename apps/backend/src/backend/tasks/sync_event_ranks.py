@@ -68,8 +68,8 @@ def process_event_rankings_response(response, event_key: str):
 
 @task(
     name="Rank Sync: Upsert Event Rankings Data",
-    retries=3, 
-    retry_delay_seconds=15
+    retries=3,
+    retry_delay_seconds=15,
 )
 def upsert_event_rankings_data(event_key, rankings, response, year: int):
     if rankings:

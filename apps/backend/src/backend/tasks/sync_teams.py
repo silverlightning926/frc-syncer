@@ -56,11 +56,7 @@ def process_team_page_response(page_num, response):
     return [Team.from_tba(item) for item in response.json()]
 
 
-@task(
-    name="Team Sync: Upsert Team Data",
-    retries=3, 
-    retry_delay_seconds=15
-)
+@task(name="Team Sync: Upsert Team Data", retries=3, retry_delay_seconds=15)
 def upsert_team_data(page_num, teams, response, year: int):
     if teams:
         upsert_teams(teams)
@@ -99,7 +95,6 @@ def throttle_request(interval_secs=5):
     version="1.0",
     retries=3,
     retry_delay_seconds=15,
-    
 )
 def fetch_teams(year: int):
     page_num = 0

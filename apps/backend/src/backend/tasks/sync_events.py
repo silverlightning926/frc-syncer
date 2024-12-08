@@ -89,17 +89,14 @@ def filter_events(events: list[Event]):
         event.divisions = [
             division
             for division in event.divisions
-            if division.division_event_key not in event_blacklist and division.parent_event_key not in event.key
+            if division.division_event_key not in event_blacklist
+            and division.parent_event_key not in event.key
         ]
 
     return events
 
 
-@task(
-    name="Event Sync: Upsert Event Data",
-    retries=3, 
-    retry_delay_seconds=15
-)
+@task(name="Event Sync: Upsert Event Data", retries=3, retry_delay_seconds=15)
 def upsert_event_data(events, response, year: int):
     if events:
         upsert_events(events)

@@ -66,8 +66,8 @@ def process_event_teams_response(response):
 
 @task(
     name="Match Sync: Upsert Event Matches Data",
-    retries=3, 
-    retry_delay_seconds=15
+    retries=3,
+    retry_delay_seconds=15,
 )
 def upsert_event_matches_data(event_key, matches, response, year: int):
     if matches:
