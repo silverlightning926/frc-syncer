@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
 
-    historic_seasons: list[int] = [
+    HISTORIC_SEASONS: list[int] = [
         2002,
         2003,
         2004,
