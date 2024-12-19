@@ -1,11 +1,11 @@
 [project]
-name = "processor"
+name = "roboskill"
 version = "0.1.0"
-description = "The Python module that handles all the data crunching and processing."
+description = "A rating system built for FIRST's FRC and FTC matches."
 authors = [
     {name = "Siddharth Rao", email = "siddrao.926@gmail.com"},
 ]
-dependencies = ["python-models @ file:///${PROJECT_ROOT}/../python-models"]
+dependencies = ["numpy>=2.2.0", "pandas>=2.2.3"]
 requires-python = ">=3.13"
 readme = "README.md"
 license = {text = "MIT"}
