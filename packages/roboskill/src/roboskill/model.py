@@ -3,8 +3,8 @@ from typing import List
 import numpy as np
 from statistics import NormalDist
 
-LEARNING_RATE: np.float32 = np.float32(0.1)
-DECAY_RATE: np.float32 = np.float32(0.99)
+LEARNING_RATE: np.float32 = np.float32(0.05)
+DECAY_RATE: np.float32 = np.float32(0.95)
 
 
 class Model:
@@ -92,8 +92,6 @@ class Model:
             new_blue_ratings.append(Rating(mu=new_mu, sigma=new_sigma, name=r.name))
 
         return (
-            np.array(
-                new_red_ratings, dtype=object
-            ),
+            np.array(new_red_ratings, dtype=object),
             np.array(new_blue_ratings, dtype=object),
         )
