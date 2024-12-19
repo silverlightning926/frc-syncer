@@ -45,7 +45,7 @@ class Rating:
     def __eq__(self, other) -> bool:
         if not isinstance(other, Rating):
             return False
-        return self.mu == other.mu and self.sigma == other.sigma
+        return np.isclose(self.mu, other.mu) and np.isclose(self.sigma, other.sigma)
 
     def __hash__(self) -> int:
         return hash((self.mu, self.sigma, self.name))
