@@ -56,9 +56,8 @@ class Model:
 
         prediction_error = np.abs(outcome - red_win_probability, dtype=np.float32)
 
-        margin_of_victory = np.abs(red_score - blue_score, dtype=np.float32)
-
-        mov_scaling_factor = np.log1p(margin_of_victory) + np.float32(1.0)
+        margin_of_victory = abs(red_score - blue_score)
+        mov_scaling_factor = np.log2(1 + margin_of_victory) / 2
 
         red_team_rating = self._calculate_team_rating(red_alliance)
         blue_team_rating = self._calculate_team_rating(blue_alliance)
