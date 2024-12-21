@@ -1,6 +1,6 @@
 from time import sleep
 
-from prefect import flow, task
+from prefect import task
 from services.db_service import insert_sync_timestamp
 from tasks.sync_event_matches import sync_all_event_matches
 from tasks.sync_event_ranks import sync_all_event_rankings
@@ -24,7 +24,7 @@ def log_sync_timestamp(year: int):
     insert_sync_timestamp(year=year)
 
 
-@flow(
+@task(
     name="Sync TBA Data For Year",
     description="Syncs data from The Blue Alliance API for a given year",
     version="1.0",
