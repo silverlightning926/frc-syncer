@@ -1,9 +1,0 @@
-{
-	"python.analysis.autoImportCompletions": true,
-	"python.analysis.typeCheckingMode": "standard",
-	"editor.formatOnSave": true,
-	"editor.codeActionsOnSave": {
-		"source.organizeImports": "explicit"
-	},
-	"editor.defaultFormatter": "ms-python.flake8"
-}
