@@ -38,7 +38,7 @@ class Alliance(BaseModel):
         match_key: str,
         color: str,
         alliance_data: dict,
-        score_breakdown: str | None,
+        score_breakdown: Optional[str] = None,
     ) -> "Alliance":
         return cls(
             key=f"{match_key}_{color}",

@@ -34,7 +34,7 @@ class Event(BaseModel):
     key: str
     name: str
     event_code: str
-    event_type: str | None
+    event_type: Optional[str] = None
     district: Optional[District] = None
     city: Optional[str] = None
     state_prov: Optional[str] = None
